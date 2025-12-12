@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- パズル用設定（平文の答えは保持しない） ---
     // 正解は「MOONLIGHT」。平文を保持しないためハッシュだけを公開する
+    // 新しい答えに差し替える場合は README の手順に従って `PEPPER` と `ANSWER_HASH` を更新する
     const ANSWER_HASH = '8568debb62aa032c8b1a2d8abf32bf76ed71d74da52d572183f01aab216085da';
     const PEPPER = 'moonlit-pepper-2025';
 
