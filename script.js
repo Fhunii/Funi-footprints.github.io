@@ -3,7 +3,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('hint-container');
 
     // --- パズル用設定（平文の答えは保持しない） ---
-    const ANSWER_HASH = '9ff141bc6fb5553acc9c8f4fbfce061c17f473e076dafbc4f5b325d8e7dd2432';
+    // 正解は「MOONLIGHT」。平文を保持しないためハッシュだけを公開する
+    const ANSWER_HASH = '8568debb62aa032c8b1a2d8abf32bf76ed71d74da52d572183f01aab216085da';
     const PEPPER = 'moonlit-pepper-2025';
 
     const answerForm = document.getElementById('answer-form');
