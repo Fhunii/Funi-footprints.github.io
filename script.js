@@ -2,14 +2,80 @@ document.addEventListener('DOMContentLoaded', () => {
     const csvFilePath = 'hintdata.csv';
     const container = document.getElementById('hint-container');
 
+    // --- パズル用設定（平文の答えは保持しない） ---
+    // 正解は「MOONLIGHT」。平文を保持しないためハッシュだけを公開する
+    // 新しい答えに差し替える場合は README の手順に従って `PEPPER` と `ANSWER_HASH` を更新する
+    const ANSWER_HASH = '8568debb62aa032c8b1a2d8abf32bf76ed71d74da52d572183f01aab216085da';
+    const PEPPER = 'moonlit-pepper-2025';
+
+    const answerForm = document.getElementById('answer-form');
+    const answerInput = document.getElementById('answer-input');
+    const feedback = document.getElementById('answer-feedback');
+    const submitButton = answerForm?.querySelector('button[type="submit"]');
+
+    function normalizeAnswer(value) {
+        return value.trim().toUpperCase();
+    }
+
+    async function hashWithPepper(value) {
+        const normalized = normalizeAnswer(value);
+        const encoder = new TextEncoder();
+        const data = encoder.encode(`${PEPPER}:${normalized}`);
+        const digest = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(digest));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    function setFeedback(message, isSuccess) {
+        if (!feedback) return;
+        feedback.textContent = message;
+        feedback.classList.remove('feedback--success', 'feedback--error');
+        feedback.classList.add(isSuccess ? 'feedback--success' : 'feedback--error');
+    }
+
+    if (answerForm && answerInput && feedback) {
+        answerForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const userAnswer = answerInput.value;
+
+            if (!userAnswer.trim()) {
+                setFeedback('回答を入力してください。', false);
+                return;
+            }
+
+            submitButton?.setAttribute('disabled', 'true');
+            setFeedback('検証中…', false);
+
+            try {
+                const hashedAnswer = await hashWithPepper(userAnswer);
+                const isCorrect = hashedAnswer === ANSWER_HASH;
+
+                if (isCorrect) {
+                    setFeedback('正解！おめでとうございます。', true);
+                } else {
+                    setFeedback('残念！もう一度挑戦してください。', false);
+                }
+            } catch (error) {
+                console.error('回答の検証でエラーが発生しました', error);
+                setFeedback('通信に問題が発生しました。時間をおいて再度お試しください。', false);
+            } finally {
+                submitButton?.removeAttribute('disabled');
+            }
+        });
+    }
+
     // CSVファイルを読み込む関数
     async function loadHints() {
         try {
             const response = await fetch(csvFilePath);
+            if (!response.ok) {
+                container.insertAdjacentHTML('beforeend', '<p class="helper-text">ヒントデータはまだ公開されていません。</p>');
+                return;
+            }
             const csvText = await response.text();
-            
+
             const hints = parseCSV(csvText);
-            
+
             // ヒントをステップごとにグループ化
             const groupedHints = hints.reduce((acc, hint) => {
                 const stepKey = `ステップ ${hint.Step}`;
@@ -22,13 +88,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // HTMLにレンダリング
             renderHints(groupedHints, container);
-            
+
             // イベントリスナーを設定
             setupToggleListeners();
 
         } catch (error) {
             console.error('ヒントデータの読み込み中にエラーが発生しました:', error);
-            container.innerHTML = '<p style="color: red;">ヒントデータを読み込めませんでした。</p>';
+            container.insertAdjacentHTML('beforeend', '<p style="color: red;">ヒントデータを読み込めませんでした。</p>');
         }
     }
 
@@ -36,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function parseCSV(text) {
         const lines = text.trim().split('\n');
         const headers = lines[0].split(',');
-        
+
         return lines.slice(1).map(line => {
             const values = line.split(',');
             let obj = {};
@@ -51,15 +117,15 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderHints(groupedHints, container) {
         for (const stepKey in groupedHints) {
             const stepData = groupedHints[stepKey];
-            
+
             // ステップコンテナの作成
             const stepDiv = document.createElement('div');
             stepDiv.className = 'hint-step';
-            
+
             // === ステップヘッダー (トグル機能付き) の作成 ===
             const stepHeader = document.createElement('div');
             stepHeader.className = 'step-header';
-            
+
             // ステップタイトル
             const stepTitle = document.createElement('h2');
             stepTitle.textContent = stepKey;
@@ -108,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (targetContent) {
                     const isExpanded = targetContent.classList.contains('active');
-                    
+
                     // 個別ヒントを開くときは、他の開いているヒントをすべて閉じる
                     document.querySelectorAll('.hint-content.active').forEach(openContent => {
                         openContent.classList.remove('active');
@@ -137,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.toggle-all-button').forEach(button => {
             button.addEventListener('click', (e) => {
                 const stepDiv = e.currentTarget.closest('.hint-step');
-                
+
                 // 現在のボタンのテキストを確認して、開くか閉じるかを決定
                 const isClosing = e.currentTarget.textContent === 'すべて非表示';
 
@@ -159,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
                 });
-                
+
                 // ボタンのテキストを切り替える
                 e.currentTarget.textContent = isClosing ? 'すべて表示' : 'すべて非表示';
             });

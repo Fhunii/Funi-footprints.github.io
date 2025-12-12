@@ -35,7 +35,145 @@ header p {
 #hint-container {
     max-width: 1000px;
     margin: 40px auto;
-    padding: 0 20px;
+    padding: 0 20px 40px;
+}
+
+/* パズルセクション */
+.puzzle {
+    background: linear-gradient(145deg, rgba(255, 215, 0, 0.08), rgba(44, 44, 44, 0.9));
+    border: 1px solid #444444;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
+    margin-bottom: 30px;
+}
+
+.puzzle__header {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 20px;
+    align-items: center;
+}
+
+.puzzle__image {
+    margin: 0;
+    background: #111;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #333;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.puzzle__image img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.puzzle__image figcaption {
+    font-size: 0.9em;
+    color: #cfcfcf;
+    padding: 10px 12px;
+    background: rgba(0, 0, 0, 0.6);
+    margin: 0;
+}
+
+.eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #ffd700;
+    font-weight: 700;
+    margin: 0 0 6px;
+}
+
+.puzzle__lead {
+    color: #d4d4d4;
+    margin-top: 6px;
+}
+
+/* 回答フォーム */
+.answer-form {
+    margin-top: 22px;
+    display: grid;
+    gap: 10px;
+}
+
+.answer-form label {
+    font-weight: 600;
+    color: #ffd700;
+}
+
+.answer-form__controls {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+}
+
+.answer-form input {
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #555;
+    background: #121212;
+    color: #f5f5f5;
+    font-size: 1em;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.answer-form input:focus {
+    outline: none;
+    border-color: #ffd700;
+    box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.25);
+}
+
+.answer-form button {
+    background-color: #ffd700;
+    color: #1a1a1a;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.answer-form button:hover {
+    background-color: #f5c400;
+    transform: translateY(-1px);
+}
+
+.answer-form button:active {
+    transform: translateY(0);
+}
+
+.helper-text {
+    color: #b8b8b8;
+    margin: 0;
+    font-size: 0.95em;
+}
+
+.feedback {
+    min-height: 1.2em;
+    margin: 4px 0 0;
+    font-weight: 700;
+}
+
+.feedback--success {
+    color: #7ee787;
+}
+
+.feedback--error {
+    color: #ff9e9e;
+}
+
+@media (max-width: 800px) {
+    .puzzle__header {
+        grid-template-columns: 1fr;
+    }
+
+    .answer-form__controls {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* ヒントのカードスタイル */
@@ -114,7 +252,7 @@ header p {
     padding: 0 20px; /* 閉じた状態の縦方向のPaddingを0にする */
     margin-top: 0;
     border-radius: 5px;
-    border-left: 5px solid #b8860b; 
+    border-left: 5px solid #b8860b;
     max-height: 0; /* 初期状態で非表示 */
     overflow: hidden;
     /* transitionにmargin-topを追加し、開閉時の見た目を滑らかに */
